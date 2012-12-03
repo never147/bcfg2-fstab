@@ -1,0 +1,88 @@
+{# ########################### Defaults section ############################ #}\
+{% python
+''' Default options '''
+# Default Filesystem to use if it can't be detected
+Default_Filesystem = 'ext3'
+# Default mount options for all file systems
+Default_Mount_Opts = 'noatime'
+# Extra mount options for ext3
+Extra_Ext3_Opts = ''
+# Extra mount options for ext4
+Extra_Ext4_Opts = 'nodelalloc'
+# Extra mount options for XFS
+Extra_XFS_Opts = 'nobarrier'
+# Default device to use for root if it cannot be detected
+Default_root_device = '/dev/sda'
+# Default device to use for swap if it cannot be detected
+Default_swap_device = '/dev/sdb'
+# List all the names of the probes here (without the leading _ and -uuid)
+Disk_Probes = ['swap','root','usr','var','boot','usr_local']
+%}\
+{# ######################### Get properties info ########################## #}\
+{%python
+''' Setup mounts from Properties/mounts.xml '''
+data = metadata.Properties['mounts.xml'].xdata
+%}\
+{# ###################### Get device info from probes ##################### #}\
+{% python
+''' Work out mount options '''
+rootfs = str(metadata.Probes.get('_root-fs',Default_Filesystem))
+opt = Default_Mount_Opts
+if len(rootfs) > 0:
+  if rootfs == 'xfs':
+    opt = ','.join(Default_Mount_Opts, Extra_XFS_Opts)
+  elif rootfs == 'ext4':
+    opt = ','.join(Default_Mount_Opts, Extra_Ext4_Opts)
+  elif rootfs == 'ext3':
+    opt = ','.join(Default_Mount_Opts, Extra_Ext3_Opts)
+%}{% python
+''' Use UUIDs if they were found '''
+uuid = {}
+for disk in Disk_Probes:
+  probe = '_%s-uuid' % disk
+  probe_res = str(metadata.Probes.get(probe, ''))
+  if probe in metadata.Probes and len(probe_res) >0:
+    uuid[disk] = 'UUID=%s' % probe_res
+  else:
+    # Assume we're in a VM if we can't find the uuid
+    if disk == 'root':
+      uuid[disk] = '/dev/sda'
+    if disk == 'swap':
+      uuid[disk] = '/dev/sdb'
+%}\
+{# ######################## Standard mount entries ######################## #}\
+# /etc/fstab: static file system information.
+#
+# <file system> <mount point>   <type>  <options>       <dump>  <pass>
+${uuid['root']}	/	${rootfs}	${opt}		0	1
+${uuid['swap']}	swap	swap	defaults		0	0
+{# #################### Non-standard mount directories #################### #}\
+{% python
+''' Remove root and swap out of the list and continue '''
+del(uuid['root'])
+del(uuid['swap'])
+%}\
+{% for dev in uuid %}\
+${uuid[dev]}	/${uuid[dev].replace('_','/')}	${rootfs}	${opt}		0	1
+{% end %}\
+{# ########### Custom mount entries loaded from properties ############### #}\
+{%python
+''' Setup mounts from Properties/mounts.xml '''
+mounts = data.xpath('.//Mounts/Mount')
+# Client mounts
+mounts.extend(data.xpath('.//Client[@name="%s"]/Mount' % metadata.hostname))
+# Group mounts
+for grp in metadata.groups:
+ mounts.extend(data.xpath('.//Group[@name="%s"]/Mount' % grp))
+fields = ['spec','file','vfstype','mntopts','freq','passno']
+%}\
+{% for m in mounts %}\
+{% for f in fields %}${m.get(f)}	{% end %}
+{% end %}\
+{# ################# Extra mount configuration added by user  ################## #}\
+{% if '_mount_config' in metadata.Probes %}\
+{%python
+_mount_config = str(metadata.Probes.get('_mount_config',None))
+%}\
+${_mount_config}
+{% end %}\

@@ -1,0 +1,1 @@
+mount|awk '/ \/ /{print $5}'

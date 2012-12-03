@@ -1,0 +1,2 @@
+#!/bin/sh
+sed -n '/#BEGIN_MOUNT_CONFIGURATION/,/#END_MOUNT_CONFIGURATION/p' /etc/fstab

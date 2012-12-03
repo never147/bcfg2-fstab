@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<Bundle name="fstab" version="2.0">
+    <Group name="debian">
+        <Path name="/etc/fstab"/>
+    </Group>
+    <Group name="centos">
+        <Path name="/etc/fstab"/>
+    </Group>
+</Bundle>

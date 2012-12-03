@@ -1,0 +1,10 @@
+#!/bin/bash
+
+export PATH="/usr/local/sbin:/usr/sbin:/sbin:/usr/local/bin:/bin:/usr/bin"
+blkid=`which blkid 2>/dev/null | grep -v ^no`
+if [ -n "$blkid" ] ;then
+
+	dev=$(/sbin/swapon -s | sed '1d;/partition/s/\s.*//')
+	[ -n "$dev" ] && $blkid $dev | sed '/UUID/!d;s/.*UUID=\"//;s/\".*//'
+
+fi

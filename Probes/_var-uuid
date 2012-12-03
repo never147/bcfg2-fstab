@@ -1,0 +1,15 @@
+#!/bin/bash
+
+#filesystems=$(mount |awk '$5 ~/(ext2|ext3|xfs|reiserfs)/ {print $1}')
+filesystems='/var'
+
+export PATH="/usr/local/sbin:/usr/sbin:/sbin:/usr/local/bin:/bin:/usr/bin"
+blkid=`which blkid 2>/dev/null`
+if [ -n "$blkid" ] ;then
+
+	# Just report the UUID of a disk
+	if [ -f /proc/mounts ] ;then
+		dev=$(awk '$2 == "'$filesystems'" {print $1}' /proc/mounts | grep -v rootfs)
+		[ -n "$dev" ] && $blkid $dev | sed 's/.*UUID=\"//;s/\".*//'
+	fi
+fi

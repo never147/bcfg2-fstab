@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Properties>
+  <Mounts>
+	<Mount spec='tmpfs' file='/dev/shm' vfstype='tmpfs' mntopts='defaults' freq='0' passno='0'/>
+	<Mount spec='devpts' file='/dev/pts' vfstype='devpts' mntopts='gid=12,mode=620' freq='0' passno='0'/>
+	<Mount spec='proc' file='/proc' vfstype='proc' mntopts='defaults' freq='0' passno='0'/>
+	<Mount spec='sysfs' file='/sys' vfstype='sysfs' mntopts='defaults' freq='0' passno='0'/>
+	<Mount spec='/dev/hdb' file='/media/cdrom0' vfstype='udf,iso9660' mntopts='user,noauto' freq='0' passno='0'/>
+	<Mount spec='/dev/scd0' file='/media/cdrom1' vfstype='udf,iso9660' mntopts='user,noauto' freq='0' passno='0'/>
+	<Mount spec='/dev/scd1' file='/media/cdrom2' vfstype='udf,iso9660' mntopts='user,noauto' freq='0' passno='0'/>
+	<Mount spec='/dev/fd0' file='/mnt/floppy0' vfstype='auto' mntopts='rw,user,noauto' freq='0' passno='0'/>
+
+	<Group name='apache-server'>
+		<Mount spec='/usr/local/www' file='/var/www' vfstype='none' mntopts='bind' freq='0' passno='0'/>
+	</Group>
+
+	<Group name='cluster2'>
+		<Mount spec='//windows-box.example.com/ISOs$' file='/srv/ISOs' vfstype='cifs' mntopts='cred=/etc/samba.cred,ro' freq='0' passno='0'/>
+	</Group>
+
+	<Client name='host.example.com'>
+		<Mount spec='nfs-srv.example.com:/fs-data/www' file='/info/www' vfstype='nfs' mntopts='rw,soft,bg' freq='0' passno='0'/>
+	</Client>
+
+	<Client name='pg.example.com'>
+		<Mount spec='UUID=c768133f-295d-4fdd-86f8-bed400a81904' file='/var/lib/postgresql' vfstype='xfs' mntopts='noatime' freq='0' passno='2'/>
+	</Client>
+  </Mounts>
+</Properties>
