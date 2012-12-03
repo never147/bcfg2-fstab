@@ -43,7 +43,9 @@ Mount points in /etc/fstab can be listed in the Properties/mounts.xml file.
 Field names are taken from the fstab manual. There are no defaults so all fields are needed.
 device mount_point filesystem options dump fsck
 
-    <Mount spec='tmpfs' file='/dev/shm' vfstype='tmpfs' mntopts='defaults' freq='0' passno='0'/>
+    <Mounts>
+        <Mount spec='tmpfs' file='/dev/shm' vfstype='tmpfs' mntopts='defaults' freq='0' passno='0'/>
+    </Mounts>
 
 The root and swap partitions are assumed to exist on all hosts and if not present or detected forced.
 Check default options in template for the assumed device names. Use probes for UUID to ensure they get
